@@ -8,6 +8,7 @@ from app.models.schemas import DeleteResult
 
 logger = logging.getLogger(__name__)
 GRAPH_BASE = "https://graph.microsoft.com/v1.0"
+MAX_RETRY_ATTEMPTS = 6
 
 
 class OneDriveDeleter:
@@ -50,7 +51,7 @@ class OneDriveDeleter:
     async def _delete_with_backoff(self, client: httpx.AsyncClient, file_id: str) -> bool:
         url = f"{GRAPH_BASE}/me/drive/items/{file_id}"
         delay = 1.0
-        for attempt in range(6):
+        for attempt in range(MAX_RETRY_ATTEMPTS):
             resp = await client.delete(url, headers=self._headers)
             if resp.status_code == 429:
                 retry_after = float(resp.headers.get("Retry-After", delay))

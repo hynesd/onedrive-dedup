@@ -8,6 +8,7 @@ from app.models.schemas import FileInfo, ScanStatus
 
 logger = logging.getLogger(__name__)
 GRAPH_BASE = "https://graph.microsoft.com/v1.0"
+MAX_RETRY_ATTEMPTS = 6
 
 
 class OneDriveScanner:
@@ -75,7 +76,7 @@ class OneDriveScanner:
     async def _request_with_backoff(self, url: str) -> httpx.Response:
         assert self._client is not None, "Client not initialised"
         delay = 1.0
-        for attempt in range(6):
+        for attempt in range(MAX_RETRY_ATTEMPTS):
             resp = await self._client.get(url, headers=self._headers)
             if resp.status_code == 429:
                 retry_after = float(resp.headers.get("Retry-After", delay))
