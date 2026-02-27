@@ -102,7 +102,7 @@ async def get_stats(request: Request) -> DashboardStats:
     duplicates = DuplicateDetector.find_duplicates(files, None)
     stats = DuplicateDetector.get_stats(files, duplicates)
     if entry:
-        stats.scan_status = entry["status"].status
+        stats.scan_status = entry["status"]
     return stats
 
 
