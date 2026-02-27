@@ -18,6 +18,10 @@ async def _delete_file(client: httpx.AsyncClient, file_id: str, headers: dict) -
             retry_after = int(response.headers.get("Retry-After", 5))
             await asyncio.sleep(retry_after)
             continue
+        if response.status_code >= 500:
+            # Retry transient server errors with exponential backoff
+            await asyncio.sleep(2 ** attempt)
+            continue
         if response.status_code == 204:
             return True, ""
         return False, f"Delete failed with status {response.status_code}"

@@ -52,6 +52,10 @@ async def _fetch_with_retry(client: httpx.AsyncClient, url: str, headers: dict, 
             retry_after = int(response.headers.get("Retry-After", 5))
             await asyncio.sleep(retry_after)
             continue
+        if response.status_code >= 500:
+            # Retry transient server errors with exponential backoff
+            await asyncio.sleep(2 ** attempt)
+            continue
         response.raise_for_status()
         return response.json()
     raise Exception(f"Max retries exceeded for {url}, last status: {last_status}")
