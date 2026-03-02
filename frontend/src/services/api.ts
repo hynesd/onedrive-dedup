@@ -1,7 +1,9 @@
 import axios from 'axios';
 import type { ScanStatus, DuplicateGroup, DashboardStats, DeleteResult, UserInfo } from '../types';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+// If VITE_API_URL is set (e.g. in Codespaces), use it.
+// Otherwise use relative URLs so Vite proxy handles routing in local dev.
+const API_BASE = import.meta.env.VITE_API_URL || '';
 
 const api = axios.create({
   baseURL: API_BASE,
